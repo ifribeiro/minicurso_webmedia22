@@ -1,4 +1,3 @@
-from cProfile import label
 import datetime
 import pandas as pd
 import numpy as np
@@ -93,7 +92,7 @@ def plot_sum_real(list_cnt_real = [], fake_data = None, list_dates=None, figtitl
     plt.clf()
     plt.close()
 
-def get_list_wks(model_samples, real_data, list_dates_real, timestep):
+def get_list_wks(model_samples, list_dates_real, timestep, wk=0):
     """    
     params:
 
@@ -106,23 +105,45 @@ def get_list_wks(model_samples, real_data, list_dates_real, timestep):
         # reshape
         s = np.load(s)
         s = s.reshape(len(list_dates_real), 1)
-        # s = s[:3287]
-        # s = np.exp(s)
-        # s = s[:, :, idx]
-        #sample_reshaped = s.reshape(250, 48, 1)
         df_sample = get_df(list_dates_real, s, timesteps=timestep)    
-        wk_fake = get_count(df_sample,4,timestep=timestep, column='ts')
+        wk_fake = get_count(df_sample,wk,timestep=timestep, column='ts')
         list_wks.append(wk_fake['cnt_0'])
-        if (i % 2 == 0):
-            print ("Done {}!".format(i))
     return list_wks
 
-def plot_compare_sum(real, somas, std):
-    fig, ax = plt.subplots()
-    x = np.arange(0,24,1)
-    ax.plot(x, real, label='real', marker='.',ls='--')
-    ax.plot(x, somas)
-    ax.fill_between(x, somas-std, somas+std, alpha=0.3)
-    ax.set_xlabel("Hora",fontdict={'fontsize':14})
-    ax.set_ylabel("Bicicletas alugadas",fontdict={'fontsize':14})
+def plot_compare_sum(dict_weeks, real):
+
+    fig = plt.figure(figsize=(15,8))
+    # top plots
+    top_1 = fig.add_subplot(3, 3, (1, 1))
+    top_2 = fig.add_subplot(3, 3, (2, 2))
+    top_3 = fig.add_subplot(3, 3, (3, 3))
+    # mid plots
+    mid_1 = fig.add_subplot(3, 3, (4, 4))
+    mid_2 = fig.add_subplot(3, 3, (5, 5))
+    mid_3 = fig.add_subplot(3, 3, (6, 6))
+    # bottom plot
+    bottom = fig.add_subplot(3, 3, (8, 8))
+    axes = [top_1, top_2, top_3, mid_1, mid_2, mid_3, bottom]
+    
+    
+    x = np.arange(0, 24, 1)
+    wks_name=['Seg.', 'Ter.', 'Qua.', 'Qui.', 'Sex.', 'Sab.', 'Dom.']
+    colors = ['orange','coral', 'fuchsia','purple', 'red','green','brown']
+    for wk in range(7):
+        a = np.array(dict_weeks[wk])
+        somas = a.mean(axis=0)
+        std = a.std(axis=0)
+        # TODO: pegar valor real de um dicionário tambem
+        # TODO: pegar linha da legenda
+        # TODO: personalizar legenda
+        axes[wk].plot(x, real, label='real', marker='o', ls='--')
+        axes[wk].plot(x, somas, label='{}'.format(wks_name[wk]), color=colors[wk])
+        axes[wk].fill_between(x, somas-std, somas+std, alpha=0.3,color=colors[wk])
+        # axes[wk].set_title(wks_name[wk])
+    
+    # ax.plot(x, real, label='real', marker='.',ls='--')
+    # ax.plot(x, somas)
+    # ax.fill_between(x, somas-std, somas+std, alpha=0.3)
+    # ax.set_xlabel("Hora",fontdict={'fontsize':14})
+    # ax.set_ylabel("Bicicletas alugadas",fontdict={'fontsize':14})
     plt.legend()
