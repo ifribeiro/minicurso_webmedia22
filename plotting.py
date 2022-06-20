@@ -110,7 +110,7 @@ def get_list_wks(model_samples, list_dates_real, timestep, wk=0):
         list_wks.append(wk_fake['cnt_0'])
     return list_wks
 
-def plot_compare_sum(dict_weeks, real):
+def plot_compare_sum(dict_weeks, real, bbox):
 
     fig = plt.figure(figsize=(15,8))
     # top plots
@@ -123,27 +123,26 @@ def plot_compare_sum(dict_weeks, real):
     mid_3 = fig.add_subplot(3, 3, (6, 6))
     # bottom plot
     bottom = fig.add_subplot(3, 3, (8, 8))
-    axes = [top_1, top_2, top_3, mid_1, mid_2, mid_3, bottom]
+    axes = [top_1, top_2, top_3, mid_1, mid_2, mid_3, bottom]    
     
-    
-    x = np.arange(0, 24, 1)
-    wks_name=['Seg.', 'Ter.', 'Qua.', 'Qui.', 'Sex.', 'Sab.', 'Dom.']
+    x = np.arange(0, 24, 1) 
+    wks_name=['Real', 'Seg.', 'Ter.', 'Qua.', 'Qui.', 'Sex.', 'Sab.', 'Dom.']
     colors = ['orange','coral', 'fuchsia','purple', 'red','green','brown']
+    # customizar a legenda
+    lista_handles = []
+    lista_ylabel = [0, 3, 6]
+    lista_xlabel = [3, 5, 6]
     for wk in range(7):
         a = np.array(dict_weeks[wk])
         somas = a.mean(axis=0)
         std = a.std(axis=0)
-        # TODO: pegar valor real de um dicionário tambem
-        # TODO: pegar linha da legenda
-        # TODO: personalizar legenda
-        axes[wk].plot(x, real, label='real', marker='o', ls='--')
-        axes[wk].plot(x, somas, label='{}'.format(wks_name[wk]), color=colors[wk])
+        handle_r,  = axes[wk].plot(x, real, label='real', marker='o', ls='--')
+        handles_s, = axes[wk].plot(x, somas, label='{}'.format(wks_name[wk]), color=colors[wk])    
         axes[wk].fill_between(x, somas-std, somas+std, alpha=0.3,color=colors[wk])
-        # axes[wk].set_title(wks_name[wk])
-    
-    # ax.plot(x, real, label='real', marker='.',ls='--')
-    # ax.plot(x, somas)
-    # ax.fill_between(x, somas-std, somas+std, alpha=0.3)
-    # ax.set_xlabel("Hora",fontdict={'fontsize':14})
-    # ax.set_ylabel("Bicicletas alugadas",fontdict={'fontsize':14})
-    plt.legend()
+        if wk in lista_ylabel:
+            axes[wk].set_ylabel('Bicicletas alugadas')
+        if wk in lista_xlabel:
+            axes[wk].set_xlabel('Horas')
+        lista_handles.append(handles_s)
+    lista_handles = [handle_r] + lista_handles
+    plt.legend(lista_handles, wks_name, bbox_to_anchor=bbox, loc='lower right')
