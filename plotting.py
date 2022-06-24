@@ -104,13 +104,14 @@ def get_list_wks(model_samples, list_dates_real, timestep, wk=0):
     for i, s in enumerate(model_samples):
         # reshape
         s = np.load(s)
+        s = s.flatten()[:len(list_dates_real)]
         s = s.reshape(len(list_dates_real), 1)
         df_sample = get_df(list_dates_real, s, timesteps=timestep)    
         wk_fake = get_count(df_sample,wk,timestep=timestep, column='ts')
         list_wks.append(wk_fake['cnt_0'])
     return list_wks
 
-def plot_compare_sum(dict_weeks, real, bbox):
+def plot_compare_sum(dict_weeks, dict_weeks_real, bbox):
 
     fig = plt.figure(figsize=(15,8))
     # top plots
@@ -134,8 +135,9 @@ def plot_compare_sum(dict_weeks, real, bbox):
     lista_xlabel = [3, 5, 6]
     for wk in range(7):
         a = np.array(dict_weeks[wk])
+        real = np.array(dict_weeks_real[wk])
         somas = a.mean(axis=0)
-        std = a.std(axis=0)
+        std = a.std(axis=0)        
         handle_r,  = axes[wk].plot(x, real, label='real', marker='o', ls='--')
         handles_s, = axes[wk].plot(x, somas, label='{}'.format(wks_name[wk]), color=colors[wk])    
         axes[wk].fill_between(x, somas-std, somas+std, alpha=0.3,color=colors[wk])
