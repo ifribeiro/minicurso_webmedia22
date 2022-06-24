@@ -111,7 +111,7 @@ def get_list_wks(model_samples, list_dates_real, timestep, wk=0):
         list_wks.append(wk_fake['cnt_0'])
     return list_wks
 
-def plot_compare_sum(dict_weeks, dict_weeks_real, bbox):
+def plot_compare_sum(dict_weeks, dict_weeks_real, bbox, figtitle="", scaler=None):
 
     fig = plt.figure(figsize=(15,8))
     # top plots
@@ -129,22 +129,29 @@ def plot_compare_sum(dict_weeks, dict_weeks_real, bbox):
     x = np.arange(0, 24, 1) 
     wks_name=['Real', 'Seg.', 'Ter.', 'Qua.', 'Qui.', 'Sex.', 'Sab.', 'Dom.']
     colors = ['orange','coral', 'fuchsia','purple', 'red','green','brown']
-    # customizar a legenda
+    # para customizar a legenda
     lista_handles = []
     lista_ylabel = [0, 3, 6]
     lista_xlabel = [3, 5, 6]
     for wk in range(7):
         a = np.array(dict_weeks[wk])
+        # retorna a escala compatível com os dados reais
+        a = scaler.inverse_transform(a.reshape(-1,1)).reshape(a.shape)
         real = np.array(dict_weeks_real[wk])
-        somas = a.mean(axis=0)
+        # retorna os dados para escala original
+        real = np.array(dict_weeks_real[wk])
+        real = scaler.inverse_transform(real.reshape(-1,1)).reshape(real.shape)
+        media_somas = a.mean(axis=0)
         std = a.std(axis=0)        
         handle_r,  = axes[wk].plot(x, real, label='real', marker='o', ls='--')
-        handles_s, = axes[wk].plot(x, somas, label='{}'.format(wks_name[wk]), color=colors[wk])    
-        axes[wk].fill_between(x, somas-std, somas+std, alpha=0.3,color=colors[wk])
+        handles_s, = axes[wk].plot(x, media_somas, label='{}'.format(wks_name[wk]), color=colors[wk])    
+        axes[wk].fill_between(x, media_somas-std, media_somas+std, alpha=0.3,color=colors[wk])
+        axes[wk].ticklabel_format(style='sci', axis='y', scilimits=(0,0))
         if wk in lista_ylabel:
             axes[wk].set_ylabel('Bicicletas alugadas')
         if wk in lista_xlabel:
-            axes[wk].set_xlabel('Horas')
+            axes[wk].set_xlabel('Horas')        
         lista_handles.append(handles_s)
     lista_handles = [handle_r] + lista_handles
     plt.legend(lista_handles, wks_name, bbox_to_anchor=bbox, loc='lower right')
+    plt.suptitle("{}".format(figtitle))
