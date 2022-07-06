@@ -2,6 +2,12 @@ import numpy as np
 from keras.models import Sequential
 from keras.layers import GRU, LSTM, Dense
 
+def get_residuals(fname, X_expected, n_steps=24):
+  fsample = np.load(fname)
+  _, y_synth = split_sequence(fsample.flatten(), n_steps)
+  resid_sample = X_expected - y_synth[:len(X_expected)]
+  return resid_sample
+
 # split a univariate sequence into samples
 def split_sequence(sequence, n_steps):
 	X, y = list(), list()
