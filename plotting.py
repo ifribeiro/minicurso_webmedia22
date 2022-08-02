@@ -83,16 +83,13 @@ def plot_sum_real(list_cnt_real = [], fake_data = None, list_dates=None, figtitl
     """
     wks_name=['Seg.', 'Ter.', 'Qua.', 'Qui.', 'Sex.', 'Sab.', 'Dom.']
     markers = ['.', '1', '*', '+', 'o', '^', 'v','']
-    fig, ax = plt.subplots(figsize=(8,5))
+    fig, ax = plt.subplots(figsize=(6,4))
     for i, cnt_real in enumerate(list_cnt_real):
         ax.plot(cnt_real,label='{}'.format(wks_name[i]), marker=markers[i])
     ax.set_xlabel("Hora", fontdict={'fontsize':14}) 
     ax.set_ylabel("Bicicletas alugadas", fontdict={'fontsize':14})
     plt.title("{}".format(figtitle))
     plt.legend()
-    plt.show()
-    plt.clf()
-    plt.close()
 
 def get_list_wks(model_samples, list_dates_real, timestep, wk=0):
     """    
