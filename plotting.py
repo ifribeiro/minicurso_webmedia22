@@ -1,4 +1,5 @@
 import datetime
+from pickle import FALSE
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -40,10 +41,8 @@ def get_count(df, wkday, timestep,column='hr'):
     
     return dict_cnt_column
 
-def add_week_hr(df, timesteps=24):
+def add_week_hr(df, timesteps=24, month=False):
     """
-    TODO: test when hour = 2
-
     Add additional columns (hour, week and minutes) to the dataframe
 
     Params
@@ -51,10 +50,12 @@ def add_week_hr(df, timesteps=24):
         - df: a pandas dataframe. Must have a column named 'date' that is a datetime object
     """
     df['wk'] = df.apply(lambda r: r.date.weekday(), axis=1)
+    if month:
+        df['month'] = df.apply(lambda r: r.date.month, axis=1)
 
     return df
 
-def get_df(list_dates=None, data=None, timesteps=24):
+def get_df(list_dates=None, data=None, timesteps=24, month=False):
     """
     Returns a pandas dataframe the columns to be used in the visualizations
 
@@ -69,9 +70,10 @@ def get_df(list_dates=None, data=None, timesteps=24):
         dict_real['cnt_{}'.format(i)] = data[:,i]
 
     df_real = pd.DataFrame(dict_real)
-    df_real = add_week_hr(df_real)
-    ts = [t for t in range(timesteps)]
-    df_real['ts'] = ts * (data.shape[0]//timesteps)
+    df_real = add_week_hr(df_real, month=month)
+    if not month:
+        ts = [t for t in range(timesteps)]
+        df_real['ts'] = ts * (data.shape[0]//timesteps)
     return df_real
 
 def plot_sum_real(list_cnt_real = [], fake_data = None, list_dates=None, figtitle="",
