@@ -41,6 +41,38 @@ def get_count(df, wkday, timestep,column='hr'):
     
     return dict_cnt_column
 
+def count_daily(df_real):
+    groupsMonth = df_real.groupby(by="month") 
+    meses = np.arange(1,13)
+    dict_meses_day = {}
+    dict_meses_wk  = {}
+    for m in meses:
+        dict_meses_day.setdefault(m,{"x":[],"cnts":[]})
+        dict_meses_wk.setdefault(m, {"x":[],"cnts":[]})
+        mes = groupsMonth.get_group(m)
+        groupsDay = mes.groupby(by="day")
+        groupsWk  = mes.groupby(by="wk")
+        x_valores_day = list(groupsDay.groups.keys())
+        x_valores_wk  = list(groupsWk.groups.keys())
+        lista_cnt = []
+        list_cnt_wk = []
+        for k in x_valores_day:
+            df = groupsDay.get_group(k)
+            cnt = df['cnt_0'].mean()
+            lista_cnt.append(cnt)
+        
+        for k in x_valores_wk:
+            df = groupsWk.get_group(k)
+            cnt = df['cnt_0'].mean()
+            list_cnt_wk.append(cnt)
+
+        dict_meses_day[m]["x"] = x_valores_day
+        dict_meses_day[m]["cnts"] = lista_cnt
+
+        dict_meses_wk[m]["x"] = x_valores_wk
+        dict_meses_wk[m]["cnts"] = list_cnt_wk
+    return dict_meses_day, dict_meses_wk        
+
 def add_week_hr(df, timesteps=24, month=False):
     """
     Add additional columns (hour, week and minutes) to the dataframe
