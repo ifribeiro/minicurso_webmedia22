@@ -52,6 +52,7 @@ def add_week_hr(df, timesteps=24, month=False):
     df['wk'] = df.apply(lambda r: r.date.weekday(), axis=1)
     if month:
         df['month'] = df.apply(lambda r: r.date.month, axis=1)
+        df['day'] = df.apply(lambda r: r.date.day, axis=1)
 
     return df
 
@@ -153,3 +154,4 @@ def plot_compare_sum(dict_weeks, dict_weeks_real, bbox, figtitle="", scaler=None
     lista_handles = [handle_r] + lista_handles
     plt.legend(lista_handles, wks_name, bbox_to_anchor=bbox, loc='lower right')
     plt.suptitle("{}".format(figtitle))
+    return fig, axes
