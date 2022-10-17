@@ -1,6 +1,7 @@
+
 import numpy as np
-from keras.models import Sequential
-from keras.layers import GRU, LSTM, Dense
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import GRU, LSTM, Dense
 
 def get_residuals(fname, X_expected, n_steps=24):
   fsample = np.load(fname)
